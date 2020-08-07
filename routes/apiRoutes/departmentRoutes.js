@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const connection = require('../../db/database');
+const inputCheck = require('../../utils/inputCheck');
 
 router.get('/departments', (req, res) => {
     const sql = `select name as department_name, id as department_id from department order by name;`;
@@ -19,6 +20,12 @@ router.get('/departments', (req, res) => {
 });
 
 router.post('/department', ({body}, res) => {
+    const errors = inputCheck(body, 'name');
+    if (errors) {
+      res.status(400).json({ error: errors });
+      return;
+    }
+
     const sql = `INSERT INTO department(name) VALUES (?);`;
     const params = [body.name];
     connection.query(sql, params, function(err, results) {
