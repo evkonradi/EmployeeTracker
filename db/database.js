@@ -1,11 +1,10 @@
-/* const mysql = require('mysql2');
+const mysql = require('mysql2');
 
-const db = new sqlite3.Database('./db/election.db', err => {
-    if (err) {
-      return console.error(err.message);
-    }
-  
-    console.log('Connected to the election database.');
+const connection = mysql.createConnection({
+  host: 'localhost',
+  user: 'root',
+  database: 'emp_tracker',
+  password: 'apple16_23'
 });
 
-module.exports = db; */
+module.exports = connection;
