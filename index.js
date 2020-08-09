@@ -1,7 +1,7 @@
 const inquirer = require('inquirer');
 const cTable = require('console.table');
-const {viewAllDepartmentsDB, addDepartmentDB, viewAllRolesDB, addRoleDB, viewAllEmployeesDB, addEmployeeDB, updateEmployeeRoleDB} = require('./db/dbQueries');
-const { values } = require('mysql2/lib/constants/charset_encodings');
+const {viewAllDepartmentsDB, addDepartmentDB, viewAllRolesDB, addRoleDB, viewAllEmployeesDB, addEmployeeDB, updateEmployeeRoleDB, updateEmployeeManagerDB, getManagersDB, viewEmployeesByManagerDB} = require('./db/dbQueries');
+//const { values } = require('mysql2/lib/constants/charset_encodings');
 
 const promptMenu = ()  => {
   
@@ -12,7 +12,7 @@ const promptMenu = ()  => {
         name: 'action',
         pageSize: 20,
         loop: false,
-        choices: ['View all departments', 'Add a department', 'View all roles', 'Add a role', 'View all employees', 'Add an employee', 'Update an employee role', 'Quit']
+        choices: ['View all employees', 'View all departments', 'View all roles', 'Add a department', 'Add a role', 'Add an employee', 'Update an employee role', 'Update employee managers', 'View employees by manager', 'Quit']
     })
     .then(({action})=>{
         if (action === 'View all departments'){
@@ -35,6 +35,12 @@ const promptMenu = ()  => {
         }
         else if (action === 'Update an employee role'){
             updateEmployeeRole();
+        }
+        else if (action === 'Update employee managers'){
+            updateEmployeeManager();
+        }
+        else if (action === 'View employees by manager'){
+            viewEmployeesByManager();
         }
         else if (action === 'Quit'){
             process.exit();
@@ -260,6 +266,73 @@ const updateEmployeeRole = () => {
    });
 };
 
+// Bonus
+const updateEmployeeManager = () => {
+    viewAllEmployeesDB()
+    .then( ([rows]) =>{
+        let employees = rows.map( ({id, first_name, last_name}) => ({
+            name: first_name + ' ' + last_name,
+            value: id
+        }));
+
+        inquirer.prompt([
+            {
+                type: 'list',
+                name: 'id',
+                message: "Please select an employee whose manager you want to change.",
+                pageSize: 20,
+                loop: false,
+                choices: employees
+            },
+            {
+                type: 'list',
+                name: 'manager_id',
+                message: "Please select a new manager for this employee.",
+                pageSize: 20,
+                loop: false,
+                choices: employees
+            }
+        ])
+        .then(
+            answers =>{
+                updateEmployeeManagerDB([answers.manager_id, answers.id])
+                .then(() => console.log("Employee's manager is changed!"))
+                .then(() => promptMenu());
+            }
+        );
+    });       
+};
+
+const viewEmployeesByManager = () => {
+    getManagersDB()
+    .then( ([rows]) =>{
+        let employees = rows.map( ({id, manager}) => ({
+            name: manager,
+            value: id
+        }));
+
+        inquirer.prompt([
+            {
+                type: 'list',
+                name: 'id',
+                message: "What Manager would you like to see the employees for?",
+                pageSize: 20,
+                loop: false,
+                choices: employees
+            }
+        ])
+        .then(
+            answers =>{
+                viewEmployeesByManagerDB([answers.id])
+                .then(([rows]) => {
+                    console.log('\n');
+                    console.table(rows);
+                })            
+                .then(() => promptMenu());
+            }
+        );
+    });
+}
 
 promptMenu();
 
