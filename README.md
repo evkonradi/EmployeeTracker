@@ -35,5 +35,5 @@ You can find the repository here: https://github.com/evkonradi/EmployeeTracker.
 # Page preview
 
 This is the preview of the initial page:
-<img src="./PagePreview.jpg">
+<img src="./ApplicationPreview.JPG">
 
