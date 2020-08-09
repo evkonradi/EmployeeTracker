@@ -1,6 +1,6 @@
 const inquirer = require('inquirer');
 const cTable = require('console.table');
-const {viewAllDepartmentsDB, addDepartmentDB, viewAllRolesDB, addRoleDB, viewAllEmployeesDB, addEmployeeDB, updateEmployeeRoleDB, updateEmployeeManagerDB, getManagersDB, viewEmployeesByManagerDB, viewEmployeesByDepartmentDB, viewBudgetOfDepartmentDB} = require('./db/dbQueries');
+const {viewAllDepartmentsDB, addDepartmentDB, viewAllRolesDB, addRoleDB, viewAllEmployeesDB, addEmployeeDB, updateEmployeeRoleDB, updateEmployeeManagerDB, getManagersDB, viewEmployeesByManagerDB, viewEmployeesByDepartmentDB, viewBudgetOfDepartmentDB, deleteEmployeeDB} = require('./db/dbQueries');
 //const { values } = require('mysql2/lib/constants/charset_encodings');
 
 const promptMenu = ()  => {
@@ -12,7 +12,7 @@ const promptMenu = ()  => {
         name: 'action',
         pageSize: 20,
         loop: false,
-        choices: ['View all employees', 'View all departments', 'View all roles', 'Add a department', 'Add a role', 'Add an employee', 'Update an employee role', 'Update employee managers', 'View employees by manager', 'View employees by department', 'View budget of a department', 'Quit']
+        choices: ['View all employees', 'View all departments', 'View all roles', 'Add a department', 'Add a role', 'Add an employee', 'Update an employee role', 'Update employee managers', 'View employees by manager', 'View employees by department', 'View budget of a department', 'Delete and employee', 'Quit']
     })
     .then(({action})=>{
         if (action === 'View all departments'){
@@ -47,6 +47,9 @@ const promptMenu = ()  => {
         }
         else if (action === 'View budget of a department'){
             viewBudgetOfDepartment();
+        }
+        else if (action === 'Delete and employee'){
+            deleteEmployee();
         }
         else if (action === 'Quit'){
             process.exit();
@@ -378,6 +381,34 @@ const viewBudgetOfDepartment = () => {
         console.table(rows);
     })
     .then(() => promptMenu());
+};
+
+const deleteEmployee = () => {
+    viewAllEmployeesDB()
+    .then( ([rows]) =>{
+        let employees = rows.map( ({id, first_name, last_name}) => ({
+            name: first_name + ' ' + last_name,
+            value: id
+        }));
+
+        inquirer.prompt([
+            {
+                type: 'list',
+                name: 'id',
+                message: "What Employee would you like to delete?",
+                pageSize: 20,
+                loop: false,
+                choices: employees
+            }
+        ])
+        .then(
+            answers =>{
+                deleteEmployeeDB([answers.id])
+                .then(() => console.log('The employee is deleted!'))
+                .then(() => promptMenu());
+            }
+        );
+    });
 };
 
 promptMenu();

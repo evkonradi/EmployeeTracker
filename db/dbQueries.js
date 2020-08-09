@@ -89,4 +89,10 @@ const viewBudgetOfDepartmentDB = () => {
     return connection.promise().query(sql);
 }
 
-module.exports = {viewAllDepartmentsDB, addDepartmentDB, viewAllRolesDB, addRoleDB, viewAllEmployeesDB, addEmployeeDB, updateEmployeeRoleDB, updateEmployeeManagerDB, getManagersDB, viewEmployeesByManagerDB, viewEmployeesByDepartmentDB, viewBudgetOfDepartmentDB};
+const deleteEmployeeDB = (params) =>{
+    const sql = `DELETE FROM employee WHERE ID = ?;`;
+    return connection.promise().query(sql, params);
+};
+
+
+module.exports = {viewAllDepartmentsDB, addDepartmentDB, viewAllRolesDB, addRoleDB, viewAllEmployeesDB, addEmployeeDB, updateEmployeeRoleDB, updateEmployeeManagerDB, getManagersDB, viewEmployeesByManagerDB, viewEmployeesByDepartmentDB, viewBudgetOfDepartmentDB, deleteEmployeeDB};
