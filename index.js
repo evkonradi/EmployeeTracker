@@ -1,6 +1,6 @@
 const inquirer = require('inquirer');
 const cTable = require('console.table');
-const {viewAllDepartmentsDB, addDepartmentDB, viewAllRolesDB, addRoleDB, viewAllEmployeesDB, addEmployeeDB, updateEmployeeRoleDB, updateEmployeeManagerDB, getManagersDB, viewEmployeesByManagerDB, viewEmployeesByDepartmentDB, viewBudgetOfDepartmentDB, deleteEmployeeDB} = require('./db/dbQueries');
+const {viewAllDepartmentsDB, addDepartmentDB, viewAllRolesDB, addRoleDB, viewAllEmployeesDB, addEmployeeDB, updateEmployeeRoleDB, updateEmployeeManagerDB, getManagersDB, viewEmployeesByManagerDB, viewEmployeesByDepartmentDB, viewBudgetOfDepartmentDB, deleteEmployeeDB, deleteRoleDB, deleteDepartmentDB} = require('./db/dbQueries');
 //const { values } = require('mysql2/lib/constants/charset_encodings');
 
 const promptMenu = ()  => {
@@ -12,7 +12,7 @@ const promptMenu = ()  => {
         name: 'action',
         pageSize: 20,
         loop: false,
-        choices: ['View all employees', 'View all departments', 'View all roles', 'Add a department', 'Add a role', 'Add an employee', 'Update an employee role', 'Update employee managers', 'View employees by manager', 'View employees by department', 'View budget of a department', 'Delete and employee', 'Quit']
+        choices: ['View all employees', 'View all departments', 'View all roles', 'Add a department', 'Add a role', 'Add an employee', 'Update an employee role', 'Update employee managers', 'View employees by manager', 'View employees by department', 'View budget of a department', 'Delete and employee', 'Delete Role', 'Delete Department', 'Quit']
     })
     .then(({action})=>{
         if (action === 'View all departments'){
@@ -50,6 +50,12 @@ const promptMenu = ()  => {
         }
         else if (action === 'Delete and employee'){
             deleteEmployee();
+        }
+        else if (action === 'Delete Role'){
+            deleteRole();
+        }
+        else if (action === 'Delete Department'){
+            deleteDepartment();
         }
         else if (action === 'Quit'){
             process.exit();
@@ -405,6 +411,62 @@ const deleteEmployee = () => {
             answers =>{
                 deleteEmployeeDB([answers.id])
                 .then(() => console.log('The employee is deleted!'))
+                .then(() => promptMenu());
+            }
+        );
+    });
+};
+
+const deleteRole = () => {
+    viewAllRolesDB()
+    .then( ([rows]) =>{
+        let roles = rows.map( ({role_id, title}) => ({
+            name: title,
+            value: role_id
+        }));
+
+        inquirer.prompt([
+            {
+                type: 'list',
+                name: 'id',
+                message: "What Role would you like to delete?",
+                pageSize: 20,
+                loop: false,
+                choices: roles
+            }
+        ])
+        .then(
+            answers =>{
+                deleteRoleDB([answers.id])
+                .then(() => console.log('The role is deleted!'))
+                .then(() => promptMenu());
+            }
+        );
+    });
+};
+
+const deleteDepartment = () => {
+    viewAllDepartmentsDB()
+    .then( ([rows]) =>{
+        let departments = rows.map( ({department_id, department_name}) => ({
+            name: department_name,
+            value: department_id
+        }));
+
+        inquirer.prompt([
+            {
+                type: 'list',
+                name: 'id',
+                message: "What Department would you like to delete?",
+                pageSize: 20,
+                loop: false,
+                choices: departments
+            }
+        ])
+        .then(
+            answers =>{
+                deleteDepartmentDB([answers.id])
+                .then(() => console.log('The Department is deleted!'))
                 .then(() => promptMenu());
             }
         );
