@@ -1,6 +1,6 @@
 const inquirer = require('inquirer');
 const cTable = require('console.table');
-const {viewAllDepartmentsDB, addDepartmentDB, viewAllRolesDB, addRoleDB, viewAllEmployeesDB, addEmployeeDB, updateEmployeeRoleDB, updateEmployeeManagerDB, getManagersDB, viewEmployeesByManagerDB} = require('./db/dbQueries');
+const {viewAllDepartmentsDB, addDepartmentDB, viewAllRolesDB, addRoleDB, viewAllEmployeesDB, addEmployeeDB, updateEmployeeRoleDB, updateEmployeeManagerDB, getManagersDB, viewEmployeesByManagerDB, viewEmployeesByDepartmentDB, viewBudgetOfDepartmentDB} = require('./db/dbQueries');
 //const { values } = require('mysql2/lib/constants/charset_encodings');
 
 const promptMenu = ()  => {
@@ -12,7 +12,7 @@ const promptMenu = ()  => {
         name: 'action',
         pageSize: 20,
         loop: false,
-        choices: ['View all employees', 'View all departments', 'View all roles', 'Add a department', 'Add a role', 'Add an employee', 'Update an employee role', 'Update employee managers', 'View employees by manager', 'Quit']
+        choices: ['View all employees', 'View all departments', 'View all roles', 'Add a department', 'Add a role', 'Add an employee', 'Update an employee role', 'Update employee managers', 'View employees by manager', 'View employees by department', 'View budget of a department', 'Quit']
     })
     .then(({action})=>{
         if (action === 'View all departments'){
@@ -41,6 +41,12 @@ const promptMenu = ()  => {
         }
         else if (action === 'View employees by manager'){
             viewEmployeesByManager();
+        }
+        else if (action === 'View employees by department'){
+            viewEmployeesByDepartment();
+        }
+        else if (action === 'View budget of a department'){
+            viewBudgetOfDepartment();
         }
         else if (action === 'Quit'){
             process.exit();
@@ -332,7 +338,47 @@ const viewEmployeesByManager = () => {
             }
         );
     });
-}
+};
+
+const viewEmployeesByDepartment = () => {
+    viewAllDepartmentsDB()
+    .then( ([rows]) =>{
+        let departments = rows.map( ({department_id, department_name}) => ({
+            name: department_name,
+            value: department_id
+        }));
+
+        inquirer.prompt([
+            {
+                type: 'list',
+                name: 'id',
+                message: "What Department would you like to see the employees for?",
+                pageSize: 20,
+                loop: false,
+                choices: departments
+            }
+        ])
+        .then(
+            answers =>{
+                viewEmployeesByDepartmentDB([answers.id])
+                .then(([rows]) => {
+                    console.log('\n');
+                    console.table(rows);
+                })            
+                .then(() => promptMenu());
+            }
+        );
+    });
+};
+
+const viewBudgetOfDepartment = () => {
+    viewBudgetOfDepartmentDB()
+    .then(([rows]) =>{
+        console.log('\n');
+        console.table(rows);
+    })
+    .then(() => promptMenu());
+};
 
 promptMenu();
 
