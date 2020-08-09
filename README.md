@@ -1,17 +1,28 @@
 # EmployeeTracker
 
-This application prompts a user for Manager and Team (Engineers and Interns) information and then generates profile HTML page that presents entered data.
-It provides data validation to prevent incorrectly entered data.
+EmployeeTracker is a command-line application that allows a user to view and manage the departments, roles, and employees in a company so that you could organize and plan your business. 
+
+It opens with the menu that provides you with the following options:
+  * View all employees
+  * View all departments
+  * View all roles
+  * Add a department
+  * Add a role
+  * Add an employee
+  * Update an employee role
+  * Update employee managers
+  * View employees by manager
+  * View employees by department
+  * View budget of a department
+  * Delete and employee
+  * Delete Role
+  * Delete Department
 
 # Technologies used
 
 * Node.js
-* jest
-* Test Driven Development(TDD)
-* Object Oriented Programming (OOP)
-* HTML
-* Bootstrap
-* CSS
+* npm, Inquirer, MySQL2, console.table
+* MySQL database
 
 # Functionality of the application - Video
 
@@ -19,11 +30,7 @@ https://drive.google.com/file/d/1fT7RVp7MhDSnbYQB9M7WyChkf1WRkXHI/view?usp=shari
 
 # GitHub repository
 
-You can find the repository here: https://github.com/evkonradi/team-profile-generator.
-
-# Example of the HTML page generated:
-
-https://evkonradi.github.io/team-profile-generator/dist/index.html
+You can find the repository here: https://github.com/evkonradi/EmployeeTracker.
 
 # Page preview
 
